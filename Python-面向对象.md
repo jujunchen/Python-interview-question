@@ -1,6 +1,4 @@
-# Python 面试题答案（完整版）
 
----
 
 ## 4. 面向对象编程
 
@@ -11,6 +9,7 @@
 **答案：**
 
 **封装（Encapsulation）：**
+
 - 将数据（属性）和操作数据的方法（函数）捆绑在一起
 - 隐藏内部实现细节，只暴露必要的接口
 - 通过访问控制（公有、私有、保护）实现
@@ -20,12 +19,13 @@
 class Person:
     def __init__(self, name):
         self._name = name  # 保护属性
-    
+
     def get_name(self):     # 公开接口
         return self._name
 ```
 
 **继承（Inheritance）：**
+
 - 子类继承父类的属性和方法
 - 实现代码复用，建立类层次关系
 - 支持单继承和多重继承
@@ -42,6 +42,7 @@ class Dog(Animal):  # 继承Animal
 ```
 
 **多态（Polymorphism）：**
+
 - 同一操作作用于不同对象会产生不同的结果
 - 通过方法重写和鸭子类型实现
 - 提高代码的灵活性和可扩展性
@@ -60,13 +61,13 @@ make_speak(Cat())    # Meow!
 
 **答案：**
 
-| 特性 | `__new__` | `__init__` |
-|------|-----------|------------|
-| 调用时机 | 对象创建之前 | 对象创建之后 |
-| 作用 | 创建并返回实例对象 | 初始化实例对象的属性 |
+| 特性    | `__new__`  | `__init__`   |
+| ----- | ---------- | ------------ |
+| 调用时机  | 对象创建之前     | 对象创建之后       |
+| 作用    | 创建并返回实例对象  | 初始化实例对象的属性   |
 | 第一个参数 | `cls`（类本身） | `self`（实例本身） |
-| 返回值 | 必须返回一个实例 | 无返回值（或None） |
-| 自定义 | 很少需要重写 | 几乎每个类都需要 |
+| 返回值   | 必须返回一个实例   | 无返回值（或None）  |
+| 自定义   | 很少需要重写     | 几乎每个类都需要     |
 
 ```python
 class MyClass:
@@ -74,7 +75,7 @@ class MyClass:
         print("Creating instance")
         instance = super().__new__(cls)  # 调用父类的__new__创建实例
         return instance
-    
+
     def __init__(self, value):
         print("Initializing instance")
         self.value = value
@@ -86,6 +87,7 @@ obj = MyClass(10)
 ```
 
 **`__new__`的使用场景：**
+
 - 实现单例模式
 - 创建不可变类型的子类（如str, int）
 - 元编程
@@ -99,11 +101,13 @@ obj = MyClass(10)
 **元类**是创建类的"类"。在Python中，类本身也是对象，元类就是创建这些类对象的类。
 
 **Python类的创建过程：**
+
 ```
 type(name, bases, dict) → 类对象 → 实例对象
 ```
 
 **默认元类是`type`：**
+
 ```python
 # 常规方式定义类
 class MyClass:
@@ -114,13 +118,14 @@ MyClass = type('MyClass', (), {'x': 1})
 ```
 
 **自定义元类：**
+
 ```python
 class MyMeta(type):
     def __new__(cls, name, bases, attrs):
         # 在创建类时添加额外属性
         attrs['class_id'] = name.lower()
         return super().__new__(cls, name, bases, attrs)
-    
+
     def __init__(cls, name, bases, attrs):
         # 类创建后的初始化
         print(f"Class {name} created")
@@ -133,6 +138,7 @@ print(MyClass.class_id)  # myclass
 ```
 
 **元类的作用：**
+
 1. 类的自动注册（如ORM模型）
 2. 自动添加方法或属性
 3. 接口检查
@@ -156,11 +162,13 @@ class C(A, B): pass  # 同时继承A和B
 **MRO（Method Resolution Order）**：决定在多重继承中，当调用一个方法时，按照什么顺序查找父类。
 
 **Python的MRO算法：C3线性化**
+
 - 子类优先于父类
 - 如果有多个父类，按照在基类列表中的顺序检查
 - 先检查第一个父类，然后递归检查它的父类，形成"深度优先"，但保持单调性
 
 **查看MRO：**
+
 ```python
 class A:
     def say(self):
@@ -195,21 +203,23 @@ MRO确保每个类只被访问一次，避免重复查找。
 **抽象基类（Abstract Base Class）** 是一种不能被实例化的类，用于定义接口规范，强制子类实现特定的方法。
 
 **作用：**
+
 - 定义接口契约
 - 确保子类实现必要的方法
 - 提供类型检查
 
 **定义抽象基类：**
+
 ```python
 from abc import ABC, abstractmethod
 
 class Shape(ABC):  # 继承ABC
-    
+
     @abstractmethod
     def area(self):
         """计算面积"""
         pass
-    
+
     @abstractmethod
     def perimeter(self):
         """计算周长"""
@@ -222,10 +232,10 @@ class Shape(ABC):  # 继承ABC
 class Circle(Shape):
     def __init__(self, radius):
         self.radius = radius
-    
+
     def area(self):
         return 3.14 * self.radius ** 2
-    
+
     def perimeter(self):
         return 2 * 3.14 * self.radius
 
@@ -234,6 +244,7 @@ print(c.area())  # 78.5
 ```
 
 **抽象属性：**
+
 ```python
 from abc import abstractproperty
 
@@ -241,7 +252,7 @@ class MyABC(ABC):
     @abstractproperty
     def value(self):
         pass
-    
+
     # Python 3.3+ 可以这样写
     @property
     @abstractmethod
@@ -254,11 +265,12 @@ class MyABC(ABC):
 ### 代码题答案
 
 **1. 解释下面代码中`self`的作用：**
+
 ```python
 class MyClass:
     def __init__(self, value):
         self.value = value
-    
+
     def get_value(self):
         return self.value
 ```
@@ -268,6 +280,7 @@ class MyClass:
 **`self`** 代表类的实例对象本身，用于访问实例的属性和方法。
 
 **关键点：**
+
 1. `self`是约定俗成的名字，可以改成其他名（但强烈不建议）
 2. 它是实例方法的第一个参数
 3. 调用方法时Python自动传入实例对象，不需要手动传
@@ -286,6 +299,7 @@ MyClass.get_value(obj)  # self就是obj
 ---
 
 **2. 写出下面代码的输出结果：**
+
 ```python
 class A:
     def say(self):
@@ -310,30 +324,35 @@ print(D.__mro__)
 **答案：**
 
 输出：
+
 ```
 B
 (<class '__main__.D'>, <class '__main__.B'>, <class '__main__.C'>, <class '__main__.A'>, <class 'object'>)
 ```
 
 **解释：**
+
 - D继承B和C，MRO顺序是 D → B → C → A → object
 - 调用`d.say()`时，按照MRO顺序查找，首先在B中找到say方法，所以输出"B"
 
 ---
 
 **3. 解释下面这些魔术方法的作用：**
-   - `__str__` 和 `__repr__`
-   - `__len__`
-   - `__getitem__`、`__setitem__`、`__delitem__`
-   - `__call__`
+
+- `__str__` 和 `__repr__`
+- `__len__`
+- `__getitem__`、`__setitem__`、`__delitem__`
+- `__call__`
 
 **答案：**
 
 **`__str__(self)`**：返回对象的"用户友好"字符串表示
+
 - `str(obj)`、`print(obj)` 时调用
 - 目标是可读性
 
 **`__repr__(self)`**：返回对象的"官方"字符串表示
+
 - `repr(obj)`、交互式环境输入obj时调用
 - 目标是明确性，通常应该能通过`eval(repr(obj))`重建对象
 
@@ -342,10 +361,10 @@ class Person:
     def __init__(self, name, age):
         self.name = name
         self.age = age
-    
+
     def __str__(self):
         return f"{self.name}, {self.age} years old"
-    
+
     def __repr__(self):
         return f"Person('{self.name}', {self.age})"
 
@@ -355,11 +374,12 @@ print(repr(p))  # Person('Alice', 25)
 ```
 
 **`__len__(self)`**：让对象支持`len()`函数
+
 ```python
 class MyList:
     def __init__(self, data):
         self.data = data
-    
+
     def __len__(self):
         return len(self.data)
 ```
@@ -372,23 +392,24 @@ class MyList:
 class MyDict:
     def __init__(self):
         self.data = {}
-    
+
     def __getitem__(self, key):
         return self.data[key]
-    
+
     def __setitem__(self, key, value):
         self.data[key] = value
-    
+
     def __delitem__(self, key):
         del self.data[key]
 ```
 
 **`__call__(self, *args, **kwargs)`**：让对象可以像函数一样被调用
+
 ```python
 class Adder:
     def __init__(self, n):
         self.n = n
-    
+
     def __call__(self, x):
         return x + self.n
 
@@ -405,10 +426,11 @@ print(add5(3))  # 8
 **答案：**
 
 **方式1：使用`__new__`方法**
+
 ```python
 class Singleton:
     _instance = None
-    
+
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super().__new__(cls)
@@ -421,15 +443,16 @@ print(s1 is s2)  # True
 ```
 
 **方式2：使用装饰器**
+
 ```python
 def singleton(cls):
     instances = {}
-    
+
     def get_instance(*args, **kwargs):
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
-    
+
     return get_instance
 
 @singleton
@@ -443,10 +466,11 @@ print(c1 is c2)  # True
 ```
 
 **方式3：使用元类**
+
 ```python
 class SingletonMeta(type):
     _instances = {}
-    
+
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super().__call__(*args, **kwargs)
@@ -457,6 +481,7 @@ class MyClass(metaclass=SingletonMeta):
 ```
 
 **方式4：使用模块（Pythonic方式）**
+
 ```python
 # singleton.py
 class Singleton:
@@ -475,18 +500,19 @@ from singleton import instance
 **答案：**
 
 **方式1：使用类实现`__enter__`和`__exit__`**
+
 ```python
 class FileManager:
     def __init__(self, filename, mode):
         self.filename = filename
         self.mode = mode
         self.file = None
-    
+
     def __enter__(self):
         """进入with语句时调用，返回值被as后的变量接收"""
         self.file = open(self.filename, self.mode)
         return self.file
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         """退出with语句时调用
         exc_type: 异常类型，如果没有异常为None
@@ -505,6 +531,7 @@ with FileManager('test.txt', 'w') as f:
 ```
 
 **方式2：使用contextmanager装饰器**
+
 ```python
 from contextlib import contextmanager
 
@@ -524,6 +551,7 @@ with file_manager('test.txt', 'w') as f:
 ```
 
 **其他示例：数据库连接上下文管理器**
+
 ```python
 import sqlite3
 
@@ -532,12 +560,12 @@ class DBConnection:
         self.db_name = db_name
         self.conn = None
         self.cursor = None
-    
+
     def __enter__(self):
         self.conn = sqlite3.connect(self.db_name)
         self.cursor = self.conn.cursor()
         return self.cursor
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:
             self.conn.commit()
@@ -555,6 +583,7 @@ with DBConnection('test.db') as cursor:
 **3. 设计一个简单的类继承体系，展示多态的使用。**
 
 **答案：**
+
 ```python
 from abc import ABC, abstractmethod
 import math
@@ -564,11 +593,11 @@ class Shape(ABC):
     @abstractmethod
     def area(self):
         pass
-    
+
     @abstractmethod
     def perimeter(self):
         pass
-    
+
     def info(self):
         print(f"This is a {self.__class__.__name__}")
         print(f"Area: {self.area():.2f}")
@@ -578,10 +607,10 @@ class Shape(ABC):
 class Circle(Shape):
     def __init__(self, radius):
         self.radius = radius
-    
+
     def area(self):
         return math.pi * self.radius ** 2
-    
+
     def perimeter(self):
         return 2 * math.pi * self.radius
 
@@ -590,10 +619,10 @@ class Rectangle(Shape):
     def __init__(self, width, height):
         self.width = width
         self.height = height
-    
+
     def area(self):
         return self.width * self.height
-    
+
     def perimeter(self):
         return 2 * (self.width + self.height)
 
@@ -608,12 +637,12 @@ class Triangle(Shape):
         self.a = a
         self.b = b
         self.c = c
-    
+
     def area(self):
         # 海伦公式
         s = (self.a + self.b + self.c) / 2
         return math.sqrt(s * (s - self.a) * (s - self.b) * (s - self.c))
-    
+
     def perimeter(self):
         return self.a + self.b + self.c
 
@@ -646,6 +675,7 @@ for shape in shapes:
 **答案：**
 
 **Python异常处理结构：**
+
 ```python
 try:
     # 可能抛出异常的代码
@@ -668,6 +698,7 @@ finally:
 ```
 
 **执行流程：**
+
 1. 执行`try`块中的代码
 2. 如果没有异常：
    - 跳过所有`except`块
@@ -679,6 +710,7 @@ finally:
 4. 最后执行`finally`块（无论是否有异常）
 
 **常见场景：**
+
 - `try`: 业务逻辑
 - `except`: 错误处理
 - `else`: 成功时的逻辑
@@ -690,25 +722,26 @@ finally:
 
 **答案：**
 
-| 异常类型 | 说明 |
-|----------|------|
-| `SyntaxError` | 语法错误 |
-| `IndentationError` | 缩进错误 |
-| `NameError` | 变量未定义 |
-| `TypeError` | 类型错误，如不支持的操作类型 |
-| `ValueError` | 值错误，类型正确但值不合适 |
-| `KeyError` | 字典中不存在的键 |
-| `IndexError` | 序列下标越界 |
-| `AttributeError` | 对象没有该属性 |
-| `ZeroDivisionError` | 除以零 |
+| 异常类型                  | 说明                            |
+| --------------------- | ----------------------------- |
+| `SyntaxError`         | 语法错误                          |
+| `IndentationError`    | 缩进错误                          |
+| `NameError`           | 变量未定义                         |
+| `TypeError`           | 类型错误，如不支持的操作类型                |
+| `ValueError`          | 值错误，类型正确但值不合适                 |
+| `KeyError`            | 字典中不存在的键                      |
+| `IndexError`          | 序列下标越界                        |
+| `AttributeError`      | 对象没有该属性                       |
+| `ZeroDivisionError`   | 除以零                           |
 | `IOError` / `OSError` | IO操作错误（Python 3.3+合并为OSError） |
-| `FileNotFoundError` | 文件不存在 |
-| `ImportError` | 导入模块失败 |
-| `RuntimeError` | 运行时错误 |
-| `NotImplementedError` | 方法未实现 |
-| `AssertionError` | assert语句失败 |
+| `FileNotFoundError`   | 文件不存在                         |
+| `ImportError`         | 导入模块失败                        |
+| `RuntimeError`        | 运行时错误                         |
+| `NotImplementedError` | 方法未实现                         |
+| `AssertionError`      | assert语句失败                    |
 
 **异常继承层次（部分）：**
+
 ```
 BaseException
 ├── Exception
@@ -734,6 +767,7 @@ BaseException
 **答案：**
 
 **自定义异常类：**
+
 ```python
 # 最简单的自定义异常
 class MyError(Exception):
@@ -745,7 +779,7 @@ class ValidationError(Exception):
         super().__init__(message)
         self.field = field
         self.value = value
-    
+
     def __str__(self):
         base_msg = super().__str__()
         if self.field:
@@ -759,14 +793,18 @@ raise ValidationError("Invalid email format", field="email", value="invalid")
 **需要自定义异常的场景：**
 
 1. **特定业务逻辑错误**：
-```python
-class InsufficientFundsError(Exception):
+   
+   ```python
+   class InsufficientFundsError(Exception):
     """账户余额不足"""
     pass
+   
+   ```
 
 def withdraw(account, amount):
     if account.balance < amount:
         raise InsufficientFundsError(f"Need {amount}, but only {account.balance} available")
+
 ```
 
 2. **区分不同的错误类型**：便于调用方精确捕获处理
@@ -797,6 +835,7 @@ class PermissionDeniedError(APIError):
 **捕获顺序原则：** 先捕获更具体（子类）的异常，再捕获更通用（父类）的异常。
 
 **错误示例（会导致第二个except永远不会执行）：**
+
 ```python
 try:
     x = 1 / 0
@@ -807,6 +846,7 @@ except ZeroDivisionError:  # 永远不会执行！
 ```
 
 **正确示例：**
+
 ```python
 try:
     x = int("invalid")
@@ -819,11 +859,13 @@ except Exception:
 ```
 
 **原因：**
+
 - Python按`except`出现的顺序依次匹配异常类型
 - 如果父类异常在前，它会匹配所有子类异常，导致后面的子类`except`永远不会执行
 - 从最具体到最通用的顺序可以确保精确的错误处理
 
 **最佳实践：**
+
 1. 只捕获你能处理的异常
 2. 尽量捕获具体的异常类型，避免裸`except:`
 3. 最后可以用`except Exception`作为兜底（但也要谨慎）
@@ -838,6 +880,7 @@ except Exception:
 **异常链**：当一个异常在处理另一个异常的过程中被抛出时，Python会记录这两个异常之间的关系。
 
 **隐式异常链（`__context__`）：**
+
 ```python
 try:
     1 / 0
@@ -851,6 +894,7 @@ except ZeroDivisionError:
 ```
 
 **显式异常链（`__cause__`），使用`raise ... from ...`：**
+
 ```python
 try:
     1 / 0
@@ -864,6 +908,7 @@ except ZeroDivisionError as e:
 ```
 
 **抑制异常链（`from None`）：**
+
 ```python
 try:
     1 / 0
@@ -874,6 +919,7 @@ except ZeroDivisionError:
 ```
 
 **访问异常链：**
+
 ```python
 try:
     try:
@@ -890,6 +936,7 @@ except ValueError as e:
 ### 代码题答案
 
 **1. 找出下面代码中的问题并修正：**
+
 ```python
 try:
     x = 1 / 0
@@ -904,6 +951,7 @@ except ZeroDivisionError:
 **问题：** `except Exception` 放在了更具体的 `except ZeroDivisionError` 前面。因为 `Exception` 是 `ZeroDivisionError` 的父类，它会先匹配到，导致第二个except永远不会执行。
 
 **修正：**
+
 ```python
 try:
     x = 1 / 0
@@ -916,6 +964,7 @@ except Exception:
 ---
 
 **2. 解释下面代码的输出：**
+
 ```python
 def func():
     try:
@@ -932,6 +981,7 @@ print(func())
 
 **解释：**
 `finally`块中的代码**总是会执行**，即使`try`块中有`return`语句。
+
 - 当执行到`try`块中的`return 1`时，函数准备返回1
 - 但在实际返回前，必须执行`finally`块
 - `finally`块中的`return 2`会覆盖之前的返回值
@@ -946,15 +996,16 @@ print(func())
 **1. 编写一个函数，读取一个文件内容，使用适当的异常处理。**
 
 **答案：**
+
 ```python
 def read_file(filename, encoding='utf-8'):
     """
     安全读取文件内容
-    
+
     Args:
         filename: 文件路径
         encoding: 文件编码
-    
+
     Returns:
         文件内容，如果读取失败返回None
     """
@@ -995,6 +1046,7 @@ def process_large_file(filename, process_func):
 **2. 自定义一个验证异常类，并在输入验证失败时抛出。**
 
 **答案：**
+
 ```python
 class ValidationError(Exception):
     """验证异常基类"""
@@ -1002,7 +1054,7 @@ class ValidationError(Exception):
         super().__init__(message)
         self.field = field
         self.value = value
-    
+
     def __str__(self):
         msg = super().__str__()
         if self.field:
@@ -1026,28 +1078,28 @@ def validate_email(email):
     import re
     if not email:
         raise EmailValidationError("邮箱不能为空", field="email", value=email)
-    
+
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(pattern, email):
         raise EmailValidationError("邮箱格式不正确", field="email", value=email)
-    
+
     return True
 
 def validate_password(password):
     if len(password) < 8:
         raise PasswordValidationError("密码长度不能少于8位", field="password", value="*" * len(password))
-    
+
     has_upper = any(c.isupper() for c in password)
     has_lower = any(c.islower() for c in password)
     has_digit = any(c.isdigit() for c in password)
-    
+
     if not (has_upper and has_lower and has_digit):
         raise PasswordValidationError(
             "密码必须包含大小写字母和数字", 
             field="password", 
             value="*" * len(password)
         )
-    
+
     return True
 
 def validate_age(age):
@@ -1055,10 +1107,10 @@ def validate_age(age):
         age = int(age)
     except (ValueError, TypeError):
         raise AgeValidationError("年龄必须是整数", field="age", value=age)
-    
+
     if age < 0 or age > 150:
         raise AgeValidationError("年龄必须在0-150之间", field="age", value=age)
-    
+
     return True
 
 
@@ -1089,20 +1141,22 @@ register_user("user@example.com", "Pass1234", "25")
 
 **答案：**
 
-| 模式 | 说明 | 文件不存在 | 现有文件内容 |
-|------|------|-----------|-------------|
-| `r` | 只读（默认） | 报错 | 保留 |
-| `w` | 只写 | 创建 | 清空（覆盖） |
-| `a` | 追加 | 创建 | 保留，写入到末尾 |
-| `r+` | 读写 | 报错 | 保留，可在任意位置写入 |
-| `w+` | 读写 | 创建 | 清空 |
-| `a+` | 读写追加 | 创建 | 保留，只能在末尾写入 |
-| `b` | 二进制模式（与其他模式组合） | - | - |
+| 模式   | 说明             | 文件不存在 | 现有文件内容      |
+| ---- | -------------- | ----- | ----------- |
+| `r`  | 只读（默认）         | 报错    | 保留          |
+| `w`  | 只写             | 创建    | 清空（覆盖）      |
+| `a`  | 追加             | 创建    | 保留，写入到末尾    |
+| `r+` | 读写             | 报错    | 保留，可在任意位置写入 |
+| `w+` | 读写             | 创建    | 清空          |
+| `a+` | 读写追加           | 创建    | 保留，只能在末尾写入  |
+| `b`  | 二进制模式（与其他模式组合） | -     | -           |
 
 **二进制模式组合：**
+
 - `rb`, `wb`, `ab`, `r+b`, `w+b`, `a+b`
 
 **详细说明：**
+
 ```python
 # r: 只读，文件必须存在
 f = open('file.txt', 'r')
@@ -1138,6 +1192,7 @@ with open('image.jpg', 'rb') as f:
 **`with`语句的优点：**
 
 1. **自动关闭文件**：无论是否发生异常，文件都会被正确关闭
+   
    ```python
    # 不使用with（容易忘记关闭）
    f = open('file.txt', 'r')
@@ -1145,7 +1200,7 @@ with open('image.jpg', 'rb') as f:
        content = f.read()
    finally:
        f.close()  # 必须手动写
-
+   
    # 使用with（自动关闭）
    with open('file.txt', 'r') as f:
        content = f.read()
@@ -1157,6 +1212,7 @@ with open('image.jpg', 'rb') as f:
 3. **异常安全**：即使处理过程中抛出异常，文件也能正确关闭，避免资源泄漏
 
 4. **支持多个上下文管理器**：
+   
    ```python
    with open('input.txt', 'r') as infile, open('output.txt', 'w') as outfile:
        outfile.write(infile.read())
@@ -1164,6 +1220,7 @@ with open('image.jpg', 'rb') as f:
 
 **`with`语句的原理：**
 上下文管理器实现了`__enter__`和`__exit__`两个方法：
+
 - 进入`with`块时调用`__enter__`
 - 离开`with`块时调用`__exit__`（即使发生异常）
 
@@ -1183,6 +1240,7 @@ with open('image.jpg', 'rb') as f:
 **Python中的管理：**
 
 1. **文件对象持有文件描述符**：
+   
    ```python
    f = open('file.txt')
    print(f.fileno())  # 获取文件描述符
@@ -1191,15 +1249,17 @@ with open('image.jpg', 'rb') as f:
 2. **自动关闭**：`with`语句确保文件描述符被释放
 
 3. **文件描述符泄漏问题**：
+   
    ```python
    # 不好的做法：如果忘记关闭，文件描述符泄漏
    for i in range(10000):
        f = open(f'file{i}.txt')  # 打开太多文件会报错
-
+   
    # OSError: [Errno 24] Too many open files
    ```
 
 4. **手动管理（不推荐）**：
+   
    ```python
    import os
    fd = os.open('file.txt', os.O_RDONLY)
@@ -1213,12 +1273,12 @@ with open('image.jpg', 'rb') as f:
 
 **答案：**
 
-| 特性 | 文本模式（t） | 二进制模式（b） |
-|------|--------------|----------------|
-| 换行符处理 | 自动转换（\n ↔ 系统换行符） | 不转换，原样读写 |
-| 编码 | 需要指定编码（默认utf-8） | 不涉及编码，直接读写字节 |
-| 读写单位 | 字符串（str） | 字节（bytes） |
-| 适用文件 | 文本文件（.txt, .py, .md） | 二进制文件（图片、视频、exe） |
+| 特性    | 文本模式（t）              | 二进制模式（b）         |
+| ----- | -------------------- | ---------------- |
+| 换行符处理 | 自动转换（\n ↔ 系统换行符）     | 不转换，原样读写         |
+| 编码    | 需要指定编码（默认utf-8）      | 不涉及编码，直接读写字节     |
+| 读写单位  | 字符串（str）             | 字节（bytes）        |
+| 适用文件  | 文本文件（.txt, .py, .md） | 二进制文件（图片、视频、exe） |
 
 **详细说明：**
 
@@ -1235,11 +1295,13 @@ with open('file.txt', 'rb') as f:
 ```
 
 **换行符转换（Windows）：**
+
 - 写入时：`\n` → `\r\n`
 - 读取时：`\r\n` → `\n`
 - 二进制模式不进行转换
 
 **编码问题：**
+
 ```python
 # 文本模式可以指定编码
 with open('file.txt', 'w', encoding='gbk') as f:
@@ -1262,6 +1324,7 @@ with open('file.txt', 'rb') as f:
 **处理大文件的原则：不要一次性读取整个文件到内存。**
 
 **方法1：逐行迭代（最常用）**
+
 ```python
 with open('huge_file.txt', 'r', encoding='utf-8') as f:
     for line in f:  # 文件对象是迭代器，逐行读取
@@ -1269,6 +1332,7 @@ with open('huge_file.txt', 'r', encoding='utf-8') as f:
 ```
 
 **方法2：分块读取**
+
 ```python
 def read_in_chunks(file_obj, chunk_size=8192):
     """按块读取文件"""
@@ -1284,6 +1348,7 @@ with open('huge_file.bin', 'rb') as f:
 ```
 
 **方法3：使用`linecache`（随机访问特定行）**
+
 ```python
 import linecache
 
@@ -1295,6 +1360,7 @@ linecache.clearcache()
 ```
 
 **方法4：使用第三方库（Pandas处理大CSV）**
+
 ```python
 import pandas as pd
 
@@ -1305,6 +1371,7 @@ for chunk in chunk_iter:
 ```
 
 **注意事项：**
+
 - 避免使用`read()`或`readlines()`读取大文件（一次性加载全部内容）
 - 使用生成器/迭代器处理数据
 - 及时释放不再需要的对象引用
@@ -1314,6 +1381,7 @@ for chunk in chunk_iter:
 ### 代码题答案
 
 **1. 解释下面代码的区别：**
+
 ```python
 # 方式1
 f = open('file.txt', 'r')
@@ -1328,16 +1396,19 @@ with open('file.txt', 'r') as f:
 **答案：**
 
 **方式1的问题：**
+
 - 如果`read()`抛出异常，`f.close()`不会执行，导致文件句柄泄漏
 - 容易忘记写`close()`
 - 需要更多样板代码（try/finally）
 
 **方式2的优点：**
+
 - `with`语句保证文件一定会被关闭，即使读取过程中发生异常
 - 代码更简洁
 - 更安全，避免资源泄漏
 
 **方式1的安全版本（等价于方式2）：**
+
 ```python
 f = open('file.txt', 'r')
 try:
@@ -1349,10 +1420,11 @@ finally:
 ---
 
 **2. 写出读取文件的几种方式及其适用场景：**
-   - `read()`
-   - `readline()`
-   - `readlines()`
-   - 迭代文件对象
+
+- `read()`
+- `readline()`
+- `readlines()`
+- 迭代文件对象
 
 **答案：**
 
@@ -1406,26 +1478,27 @@ with open('file.txt', 'r') as f:
 **1. 编写一个函数，统计一个文本文件的行数、单词数和字符数。**
 
 **答案：**
+
 ```python
 def count_file_stats(filename, encoding='utf-8'):
     """
     统计文件的行数、单词数和字符数
-    
+
     返回: (行数, 单词数, 字符数)
     """
     lines_count = 0
     words_count = 0
     chars_count = 0
-    
+
     try:
         with open(filename, 'r', encoding=encoding) as f:
             for line in f:
                 lines_count += 1
                 chars_count += len(line)
                 words_count += len(line.split())
-        
+
         return lines_count, words_count, chars_count
-    
+
     except FileNotFoundError:
         print(f"错误: 文件 '{filename}' 不存在")
         return None
@@ -1443,17 +1516,17 @@ def wc(filename, mode='lwc'):
     stats = count_file_stats(filename)
     if stats is None:
         return
-    
+
     lines, words, chars = stats
     result = []
-    
+
     if 'l' in mode:
         result.append(str(lines))
     if 'w' in mode:
         result.append(str(words))
     if 'c' in mode:
         result.append(str(chars))
-    
+
     result.append(filename)
     print(' '.join(result))
 
@@ -1474,13 +1547,14 @@ wc('example.txt')  # 像Unix wc一样输出
 **2. 实现一个函数，将一个大文件分割成多个小文件。**
 
 **答案：**
+
 ```python
 import os
 
 def split_file_by_lines(input_file, lines_per_file=1000, output_prefix='part_', encoding='utf-8'):
     """
     按行数分割大文件
-    
+
     Args:
         input_file: 输入文件路径
         lines_per_file: 每个文件的行数
@@ -1489,21 +1563,21 @@ def split_file_by_lines(input_file, lines_per_file=1000, output_prefix='part_', 
     """
     file_num = 1
     current_lines = []
-    
+
     with open(input_file, 'r', encoding=encoding) as f:
         for line_num, line in enumerate(f, 1):
             current_lines.append(line)
-            
+
             # 达到指定行数，写入文件
             if len(current_lines) >= lines_per_file:
                 output_file = f"{output_prefix}{file_num:04d}.txt"
                 with open(output_file, 'w', encoding=encoding) as out_f:
                     out_f.writelines(current_lines)
                 print(f"Created: {output_file}")
-                
+
                 file_num += 1
                 current_lines = []
-        
+
         # 处理剩余的行
         if current_lines:
             output_file = f"{output_prefix}{file_num:04d}.txt"
@@ -1515,20 +1589,20 @@ def split_file_by_lines(input_file, lines_per_file=1000, output_prefix='part_', 
 def split_file_by_size(input_file, size_per_file=10*1024*1024, output_prefix='part_'):
     """
     按大小分割文件（二进制模式，适用于任何文件）
-    
+
     Args:
         input_file: 输入文件路径
         size_per_file: 每个文件的大小（字节），默认10MB
         output_prefix: 输出文件前缀
     """
     file_num = 1
-    
+
     with open(input_file, 'rb') as f:
         while True:
             chunk = f.read(size_per_file)
             if not chunk:
                 break
-            
+
             output_file = f"{output_prefix}{file_num:04d}"
             with open(output_file, 'wb') as out_f:
                 out_f.write(chunk)
@@ -1549,7 +1623,7 @@ def merge_files(output_file, input_files, encoding='utf-8'):
 if __name__ == '__main__':
     # 按行数分割文本文件
     split_file_by_lines('big_log.txt', lines_per_file=5000)
-    
+
     # 按大小分割二进制文件
     split_file_by_size('big_data.bin', size_per_file=5*1024*1024)
 ```

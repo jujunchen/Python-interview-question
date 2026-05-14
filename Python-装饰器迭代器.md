@@ -1,6 +1,4 @@
-# Python 面试题答案（第7-15章）
 
----
 
 ## 7. 装饰器与闭包
 
@@ -13,6 +11,7 @@
 **闭包**是指一个函数对象能够记住并访问它的词法作用域中的变量，即使这个函数在它的词法作用域之外被调用。
 
 **闭包的三个条件：**
+
 1. **必须有一个嵌套函数**（内部函数）
 2. **内部函数必须引用外部函数中的变量**
 3. **外部函数必须返回内部函数**
@@ -30,6 +29,7 @@ print(add5(3))   # 8
 ```
 
 **闭包的特性：**
+
 - 记住外层函数的变量状态
 - 即使外层函数执行完毕，内部函数仍然能访问那些变量
 - 每个闭包有自己独立的环境
@@ -139,10 +139,10 @@ say_hello()
 
 **执行时机总结：**
 
-| 时机 | 执行内容 |
-|------|---------|
+| 时机             | 执行内容                   |
+| -------------- | ---------------------- |
 | **定义时**（导入模块时） | 装饰器函数本身执行一次，wrapper被创建 |
-| **调用时**（每次调用） | wrapper函数执行 |
+| **调用时**（每次调用）  | wrapper函数执行            |
 
 **重要：** 装饰器只在定义时执行一次，不是每次调用都执行装饰器本身。
 
@@ -177,6 +177,7 @@ greet()
 ```
 
 **对比：**
+
 ```python
 # 无参数装饰器
 @decorator
@@ -192,6 +193,7 @@ def func():
 ```
 
 **示例：带条件的日志装饰器**
+
 ```python
 def log(level="INFO"):
     def decorator(func):
@@ -215,6 +217,7 @@ def process_data():
 `functools.wraps`用于保留原函数的元信息（函数名、文档字符串、参数列表等）。
 
 **不使用wraps的问题：**
+
 ```python
 def decorator(func):
     def wrapper(*args, **kwargs):
@@ -232,6 +235,7 @@ print(hello.__doc__)     # This is wrapper （不是原函数的文档！）
 ```
 
 **使用wraps后：**
+
 ```python
 from functools import wraps
 
@@ -252,6 +256,7 @@ print(hello.__doc__)     # Say hello （正确！）
 ```
 
 **`@wraps`保留的信息：**
+
 - `__name__`：函数名
 - `__doc__`：文档字符串
 - `__module__`：模块名
@@ -259,6 +264,7 @@ print(hello.__doc__)     # Say hello （正确！）
 - `__qualname__`：限定名
 
 **为什么需要它？**
+
 - 调试时能看到正确的函数名
 - 文档工具（如help()、pydoc）能正确显示
 - 序列化、反射等场景依赖正确的元信息
@@ -269,6 +275,7 @@ print(hello.__doc__)     # Say hello （正确！）
 ### 代码题答案
 
 **1. 写出下面代码的输出结果：**
+
 ```python
 def outer(x):
     def inner(y):
@@ -284,6 +291,7 @@ print(add5(3))
 输出：`8`
 
 **解释：**
+
 - `outer(5)`执行，x=5，返回inner函数，此时inner记住了x=5（闭包）
 - `add5`就是这个记住了x=5的inner函数
 - 调用`add5(3)`时，y=3，所以 x + y = 5 + 3 = 8
@@ -291,6 +299,7 @@ print(add5(3))
 ---
 
 **2. 解释下面装饰器的执行顺序：**
+
 ```python
 def decorator1(func):
     print("decorator1")
@@ -317,6 +326,7 @@ hello()
 **答案：**
 
 输出：
+
 ```
 decorator2
 decorator1
@@ -328,6 +338,7 @@ hello
 **解释：**
 
 **定义时（从上到下装饰，从下到上执行）：**
+
 ```python
 # @decorator1
 # @decorator2
@@ -335,13 +346,16 @@ hello
 # 等价于:
 hello = decorator1(decorator2(hello))
 ```
+
 1. 先执行`decorator2(hello)`，输出"decorator2"
 2. 再执行`decorator1(...)`，输出"decorator1"
 
 **调用时（从上到下执行wrapper）：**
+
 ```
 hello() → wrapper1() → wrapper2() → 原hello()
 ```
+
 1. 调用最外层的wrapper1，输出"wrapper1"
 2. wrapper1调用func（即decorator2返回的wrapper2），输出"wrapper2"
 3. wrapper2调用func（即原hello函数），输出"hello"
@@ -353,6 +367,7 @@ hello() → wrapper1() → wrapper2() → 原hello()
 **1. 实现一个带参数的装饰器，控制函数被调用的次数。**
 
 **答案：**
+
 ```python
 from functools import wraps
 
@@ -360,7 +375,7 @@ def call_limit(max_calls):
     """限制函数调用次数的装饰器"""
     def decorator(func):
         call_count = 0  # 记录调用次数（闭包变量）
-        
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             nonlocal call_count
@@ -371,7 +386,7 @@ def call_limit(max_calls):
             call_count += 1
             print(f"Call {call_count}/{max_calls}: {func.__name__}")
             return func(*args, **kwargs)
-        
+
         return wrapper
     return decorator
 
@@ -391,7 +406,7 @@ greet("Dave")   # RuntimeError!
 def call_limit_with_reset(max_calls):
     def decorator(func):
         call_count = 0
-        
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             nonlocal call_count
@@ -399,12 +414,12 @@ def call_limit_with_reset(max_calls):
                 raise RuntimeError(f"Call limit exceeded")
             call_count += 1
             return func(*args, **kwargs)
-        
+
         def reset():
             nonlocal call_count
             call_count = 0
             print("Call count reset")
-        
+
         # 给wrapper添加方法
         wrapper.reset = reset
         return wrapper
@@ -426,6 +441,7 @@ func()        # 可以再次调用
 **2. 实现一个类装饰器。**
 
 **答案：**
+
 ```python
 from functools import wraps
 
@@ -434,23 +450,23 @@ class LogCalls:
     def __init__(self, log_file=None):
         self.log_file = log_file
         self.call_count = 0
-    
+
     def __call__(self, func):
         """当装饰器应用到函数时调用"""
         @wraps(func)
         def wrapper(*args, **kwargs):
             self.call_count += 1
             log_msg = f"Call #{self.call_count}: {func.__name__} with args={args}, kwargs={kwargs}"
-            
+
             if self.log_file:
                 with open(self.log_file, 'a') as f:
                     f.write(log_msg + '\n')
             else:
                 print(log_msg)
-            
+
             result = func(*args, **kwargs)
             return result
-        
+
         return wrapper
 
 
@@ -471,13 +487,13 @@ multiply(4, 5)
 def singleton(cls):
     """单例装饰器（装饰类）"""
     instances = {}
-    
+
     @wraps(cls)
     def get_instance(*args, **kwargs):
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
-    
+
     return get_instance
 
 @singleton
@@ -495,7 +511,7 @@ class Timer:
     def __init__(self, func):
         self.func = func
         wraps(func)(self)  # 保留原函数信息
-    
+
     def __call__(self, *args, **kwargs):
         import time
         start = time.time()
@@ -517,6 +533,7 @@ slow_function()
 **3. 实现一个缓存装饰器（类似lru_cache）。**
 
 **答案：**
+
 ```python
 from functools import wraps
 from collections import OrderedDict
@@ -524,7 +541,7 @@ from collections import OrderedDict
 def simple_cache(func):
     """简单缓存装饰器"""
     cache = {}
-    
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         # 创建缓存键：参数的哈希
@@ -535,7 +552,7 @@ def simple_cache(func):
         else:
             print(f"[CACHE HIT] {func.__name__}{args}")
         return cache[key]
-    
+
     return wrapper
 
 
@@ -543,11 +560,11 @@ def lru_cache(maxsize=128):
     """LRU缓存装饰器（最近最少使用淘汰）"""
     def decorator(func):
         cache = OrderedDict()
-        
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             key = (args, tuple(sorted(kwargs.items())))
-            
+
             if key in cache:
                 # 命中：移到末尾表示最近使用
                 cache.move_to_end(key)
@@ -560,16 +577,16 @@ def lru_cache(maxsize=128):
                     print(f"[LRU EVICT]")
                 cache[key] = func(*args, **kwargs)
                 print(f"[LRU MISS]")
-            
+
             return cache[key]
-        
+
         # 添加缓存管理方法
         def cache_info():
             return f"CacheInfo(hits={...}, misses={...}, maxsize={maxsize})"
-        
+
         def cache_clear():
             cache.clear()
-        
+
         wrapper.cache_info = cache_info
         wrapper.cache_clear = cache_clear
         return wrapper
@@ -595,24 +612,24 @@ def ttl_cache(ttl_seconds=60):
     """带过期时间的缓存"""
     def decorator(func):
         cache = {}  # key: (value, timestamp)
-        
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             key = (args, tuple(sorted(kwargs.items())))
             now = time.time()
-            
+
             if key in cache:
                 value, timestamp = cache[key]
                 if now - timestamp < ttl_seconds:
                     print(f"[TTL HIT]")
                     return value
-            
+
             # 缓存未命中或已过期
             result = func(*args, **kwargs)
             cache[key] = (result, now)
             print(f"[TTL MISS]")
             return result
-        
+
         return wrapper
     return decorator
 ```
@@ -628,17 +645,20 @@ def ttl_cache(ttl_seconds=60):
 **答案：**
 
 **可迭代对象（Iterable）：**
+
 - 实现了`__iter__()`方法的对象
 - 可以被`for`循环遍历
 - 例子：list, tuple, dict, str, set
 
 **迭代器（Iterator）：**
+
 - 实现了`__iter__()`和`__next__()`方法的对象
 - 是一个有状态的对象，记住遍历的位置
 - 调用`__next__()`返回下一个元素
 - 没有元素时抛出`StopIteration`异常
 
 **关系：**
+
 ```python
 # 可迭代对象调用iter()得到迭代器
 my_list = [1, 2, 3]          # Iterable
@@ -652,12 +672,12 @@ print(next(it))  # StopIteration
 
 **区别：**
 
-| 特性 | Iterable | Iterator |
-|------|----------|----------|
+| 特性   | Iterable     | Iterator                    |
+| ---- | ------------ | --------------------------- |
 | 实现方法 | `__iter__()` | `__iter__()` + `__next__()` |
-| 状态 | 无状态 | 有状态（记住位置） |
-| 重复遍历 | 可以多次遍历 | 只能遍历一次 |
-| 示例 | list, tuple | iter(list), generator |
+| 状态   | 无状态          | 有状态（记住位置）                   |
+| 重复遍历 | 可以多次遍历       | 只能遍历一次                      |
+| 示例   | list, tuple  | iter(list), generator       |
 
 ```python
 # Iterable可以多次遍历
@@ -684,6 +704,7 @@ for n in it:
 **生成器**是一种特殊的迭代器，使用函数定义（包含`yield`语句），可以惰性地产生值。
 
 **创建生成器的两种方式：**
+
 ```python
 # 方式1：生成器函数
 def count(n):
@@ -703,17 +724,27 @@ gen = (x**2 for x in range(10))
 **生成器的优点：**
 
 1. **内存高效（惰性求值）**：
+   
    - 只在需要时计算下一个值
+   
    - 处理大数据时不占用大量内存
-   ```python
-   # 列表：占用大量内存
-   big_list = [x**2 for x in range(1000000)]  # 内存中存储所有值
-
+     
+     ```python
+     # 列表：占用大量内存
+     big_list = [x**2 for x in range(1000000)]  # 内存中存储所有值
+     
+     ```
+   
    # 生成器：几乎不占内存
+   
    big_gen = (x**2 for x in range(1000000))   # 只保存计算逻辑
+   
+   ```
+   
    ```
 
 2. **表示无限序列**：
+   
    ```python
    def infinite_counter():
        n = 0
@@ -738,6 +769,7 @@ gen = (x**2 for x in range(10))
 **答案：**
 
 **`yield`**是生成器的核心，它的作用是：
+
 1. 暂停函数执行，返回一个值给调用者
 2. 保存函数的状态（局部变量、指针位置等）
 3. 下次调用`next()`时，从暂停的地方继续执行
@@ -787,6 +819,7 @@ next(gen)  # 继续执行
 **生成器表达式**是创建生成器的简洁语法，用圆括号包裹。
 
 **语法：**
+
 ```python
 # 列表推导式（方括号）
 list_comp = [x**2 for x in range(10)]
@@ -797,13 +830,13 @@ gen_exp = (x**2 for x in range(10))
 
 **区别：**
 
-| 特性 | 列表推导式 | 生成器表达式 |
-|------|-----------|-------------|
-| 内存 | 立即计算所有值，占用内存 | 惰性计算，几乎不占内存 |
-| 执行时机 | 定义时立即计算 | 迭代时才计算 |
-| 遍历次数 | 可多次遍历 | 只能遍历一次 |
-| 表示无限序列 | 不可能 | 可以 |
-| 语法 | `[...]` | `(...)` |
+| 特性     | 列表推导式        | 生成器表达式      |
+| ------ | ------------ | ----------- |
+| 内存     | 立即计算所有值，占用内存 | 惰性计算，几乎不占内存 |
+| 执行时机   | 定义时立即计算      | 迭代时才计算      |
+| 遍历次数   | 可多次遍历        | 只能遍历一次      |
+| 表示无限序列 | 不可能          | 可以          |
+| 语法     | `[...]`      | `(...)`     |
 
 ```python
 # 内存对比
@@ -834,6 +867,7 @@ for x in gen_exp:  # 现在才开始计算
 ```
 
 **使用场景：**
+
 - 列表推导式：数据量小，需要多次访问，需要索引访问
 - 生成器表达式：数据量大，只需遍历一次，内存受限
 
@@ -846,6 +880,7 @@ for x in gen_exp:  # 现在才开始计算
 **协程**是一种可以暂停和恢复执行的函数，用于协作式多任务。
 
 **协程的状态：**
+
 - `GEN_CREATED`: 等待开始执行
 - `GEN_RUNNING`: 正在执行
 - `GEN_SUSPENDED`: 在yield处暂停
@@ -875,16 +910,17 @@ c.close()
 **`yield from`的作用：**
 
 1. **委托给子生成器**：简化生成器嵌套调用
+   
    ```python
    def sub_generator():
        yield 1
        yield 2
-
+   
    def main_generator():
        # 不使用yield from
        for x in sub_generator():
            yield x
-       
+   
        # 使用yield from
        yield from sub_generator()  # 等价于上面两行
    ```
@@ -906,6 +942,7 @@ m.send(42)  # Sub got: 42
 ```
 
 3. **获取子生成器返回值**：
+   
    ```python
    def calc_sum():
        total = 0
@@ -915,11 +952,11 @@ m.send(42)  # Sub got: 42
                break
            total += x
        return total  # 子生成器返回值
-
+   
    def main():
        result = yield from calc_sum()
        print(f"Sum = {result}")
-
+   
    m = main()
    next(m)
    m.send(1)
@@ -932,6 +969,7 @@ m.send(42)  # Sub got: 42
 ### 代码题答案
 
 **1. 写出下面代码的输出结果：**
+
 ```python
 def generator():
     yield 1
@@ -947,6 +985,7 @@ print(next(g))
 **答案：**
 
 输出：
+
 ```
 1
 2
@@ -954,6 +993,7 @@ print(next(g))
 ```
 
 **解释：**
+
 - `generator()`创建生成器对象g
 - 第一次`next(g)`：执行到第一个yield，返回1
 - 第二次`next(g)`：继续执行到第二个yield，返回2
@@ -963,6 +1003,7 @@ print(next(g))
 ---
 
 **2. 解释下面代码的区别：**
+
 ```python
 # 列表推导式
 list_comp = [x**2 for x in range(1000000)]
@@ -973,16 +1014,17 @@ gen_exp = (x**2 for x in range(1000000))
 
 **答案：**
 
-| 区别 | list_comp | gen_exp |
-|------|-----------|---------|
-| 类型 | list | generator |
-| 内存占用 | 约8MB（100万个整数） | 约128字节 |
-| 计算时机 | 定义时立即计算所有值 | 迭代时逐个计算 |
-| 是否可索引 | 是（`list_comp[100]`） | 否 |
-| 遍历次数 | 可多次 | 只能一次 |
-| 是否可修改 | 是 | 否 |
+| 区别    | list_comp           | gen_exp   |
+| ----- | ------------------- | --------- |
+| 类型    | list                | generator |
+| 内存占用  | 约8MB（100万个整数）       | 约128字节    |
+| 计算时机  | 定义时立即计算所有值          | 迭代时逐个计算   |
+| 是否可索引 | 是（`list_comp[100]`） | 否         |
+| 遍历次数  | 可多次                 | 只能一次      |
+| 是否可修改 | 是                   | 否         |
 
 **实际影响：**
+
 ```python
 import sys
 
@@ -1012,6 +1054,7 @@ for x in gen_exp:
 **1. 实现一个自定义迭代器，产生斐波那契数列。**
 
 **答案：**
+
 ```python
 # 方式1：实现迭代器协议
 class FibonacciIterator:
@@ -1024,14 +1067,14 @@ class FibonacciIterator:
         self.a = 0
         self.b = 1
         self.count = 0
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         if self.max_n is not None and self.count >= self.max_n:
             raise StopIteration
-        
+
         result = self.a
         self.a, self.b = self.b, self.a + self.b
         self.count += 1
@@ -1092,6 +1135,7 @@ for num in infinite_fibonacci():
 **2. 使用生成器实现一个大文件的逐行读取处理。**
 
 **答案：**
+
 ```python
 def read_large_file(filepath, encoding='utf-8'):
     """逐行读取大文件，内存高效"""
@@ -1128,7 +1172,7 @@ def process_file_pipeline(filepath, keyword):
     lines = read_large_file(filepath)
     filtered = filter_lines(lines, keyword)
     processed = process_lines(filtered)
-    
+
     for result in processed:
         yield result
 
@@ -1157,7 +1201,7 @@ def read_csv_rows(filepath):
 # 使用示例
 if __name__ == '__main__':
     print("处理大文件示例:")
-    
+
     # 统计日志文件中的错误行
     error_count = 0
     for line in read_large_file('access.log'):
@@ -1165,9 +1209,9 @@ if __name__ == '__main__':
             error_count += 1
             if error_count <= 5:  # 只打印前5条错误
                 print(f"错误#{error_count}: {line}")
-    
+
     print(f"总共找到 {error_count} 条错误记录")
-    
+
     # 使用管道处理
     print("\n使用处理管道:")
     results = process_file_pipeline('data.csv', 'important')
@@ -1182,6 +1226,7 @@ if __name__ == '__main__':
 **3. 实现一个简单的协程，展示生产者-消费者模式。**
 
 **答案：**
+
 ```python
 import time
 import random
@@ -1205,12 +1250,12 @@ def producer(consumers, items):
     # 先启动所有消费者
     for c in consumers:
         next(c)  # 预激协程
-    
+
     # 分发任务
     for i, item in enumerate(items):
         consumer = consumers[i % len(consumers)]  # 轮询分发
         consumer.send(item)
-    
+
     # 发送结束信号
     for c in consumers:
         c.send(None)
@@ -1233,45 +1278,45 @@ def processor(name):
 def coordinator(tasks):
     p1 = processor("A")
     p2 = processor("B")
-    
+
     next(p1)
     next(p2)
-    
+
     for i, task in enumerate(tasks):
         if i % 2 == 0:
             p1.send(task)
         else:
             p2.send(task)
-    
+
     # 获取返回值
     try:
         p1.send(None)
     except StopIteration as e:
         results1 = e.value
-    
+
     try:
         p2.send(None)
     except StopIteration as e:
         results2 = e.value
-    
+
     return results1 + results2
 
 
 # 主函数
 def main():
     print("=== 生产者-消费者模式 ===")
-    
+
     # 创建多个消费者
     consumers = [
         consumer("Worker1"),
         consumer("Worker2"),
         consumer("Worker3")
     ]
-    
+
     # 生产任务
     tasks = [f"Task{i}" for i in range(10)]
     producer(consumers, tasks)
-    
+
     print("\n=== 协程收集返回值 ===")
     results = coordinator(["Data1", "Data2", "Data3", "Data4"])
     print("所有结果:", results)
@@ -1306,18 +1351,18 @@ async def async_producer(queue, items):
 
 async def async_main():
     queue = asyncio.Queue()
-    
+
     # 创建消费者任务
     consumers = [
         asyncio.create_task(async_consumer(f"Worker{i}", queue))
         for i in range(3)
     ]
-    
+
     # 创建生产者
     producer = asyncio.create_task(
         async_producer(queue, [f"Job{i}" for i in range(8)])
     )
-    
+
     await producer
     await asyncio.gather(*consumers)
 
